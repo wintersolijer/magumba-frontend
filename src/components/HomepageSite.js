@@ -12,7 +12,7 @@ const HomepageSite = () => {
   return (
     <>
       {/* Navbar */}
-      <Navbar transparent />
+      <Navbar  />
       <main>
         {/* Hero-Bereich */}
         <div

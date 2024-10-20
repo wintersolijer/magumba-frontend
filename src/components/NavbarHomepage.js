@@ -1,15 +1,15 @@
-// src/components/Navbar.js
+// src/components/NavbarHomepage.js
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Sidebar from './hompage/Sidebar';
-import SidebarToggle from './hompage/Toogle';
+import Sidebar from './homepage/Sidebar';
+import SidebarToggle from './homepage/SidebarToggle';
 
 const Navbar = ({ transparent }) => {
-  const [navbarOpen, setNavbarOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {
+    console.log('Sidebar toggle clicked');
     setSidebarOpen(!sidebarOpen);
   };
 
@@ -20,8 +20,8 @@ const Navbar = ({ transparent }) => {
 
       {/* Navbar */}
       <nav
-        className={`fixed w-full flex items-center justify-between px-2 py-3 ${
-          transparent ? 'top-0 absolute z-50 w-full' : 'relative shadow-lg bg-white'
+        className={`fixed w-full flex items-center justify-between px-4 py-3 ${
+          transparent ? 'top-0 absolute z-50 w-full' : 'relative shadow-lg bg-gray-800'
         }`}
       >
         <div className="container px-4 mx-auto flex items-center justify-between">
@@ -32,24 +32,27 @@ const Navbar = ({ transparent }) => {
             {/* Logo oder Titel */}
             <Link
               to="/"
-              className="text-white text-sm font-bold leading-relaxed inline-block mr-4 ml-4 py-2 whitespace-nowrap uppercase"
+              className="text-white text-sm font-bold leading-relaxed inline-block ml-4 py-2 whitespace-nowrap uppercase"
             >
               Mein Spiel
             </Link>
           </div>
 
           {/* Navigation für größere Bildschirme */}
+          {/* ... */}
+       
+{/* Navigation für größere Bildschirme */}
           <div
             className={
               'lg:flex flex-grow items-center' +
-              (navbarOpen ? ' flex' : ' hidden')
+              (sidebarOpen ? ' flex' : ' hidden')
             }
           >
             <ul className="flex flex-col lg:flex-row list-none lg:ml-auto">
               <li className="nav-item">
                 <Link
                   to="/login"
-                  className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75"
+                  className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-black hover:opacity-75"
                 >
                   Login
                 </Link>
@@ -57,7 +60,7 @@ const Navbar = ({ transparent }) => {
               <li className="nav-item">
                 <Link
                   to="/register"
-                  className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75"
+                  className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-black hover:opacity-75"
                 >
                   Registrieren
                 </Link>

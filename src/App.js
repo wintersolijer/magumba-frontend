@@ -2,12 +2,15 @@
 
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
 
 // Importiere die Komponenten
 import Login from './components/Login';
 import Register from './components/Register';
 import QuizForm from './components/QuizForm';
 import HomepageSite from './components/HomepageSite';
+import Quiz from './components/Quiz';
 
 function App() {
   return (
@@ -22,6 +25,7 @@ function App() {
         {/* Weitere Routen können hier hinzugefügt werden */}
         <Route path="/quizform" element={<QuizForm />} />
         <Route path="/homepage" element={<HomepageSite />} />
+        <Route path='/quiz' element = {<Quiz />} />
       </Routes>
     </Router>
   );

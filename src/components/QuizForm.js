@@ -11,6 +11,7 @@ function QuizForm() {
     const [question, setQuestion] = React.useState('');
     const [answers, setAnswers] = React.useState([{ answer: '', isTrue: false }]);
     const [points, setPoints] = React.useState(1);
+    const [explaination, setExplainiation] = React.useState('');
   
     const handleAddAnswer = () => {
       setAnswers([...answers, { answer: '', isTrue: false }]);
@@ -26,7 +27,7 @@ function QuizForm() {
       e.preventDefault();
   
       // Daten, die an das Backend gesendet werden sollen
-      const data = { question, answers, points };
+      const data = { question, answers, points , explaination };
   
       // AJAX-Anfrage an das Flask-Backend
       fetch('/add_question', {
@@ -120,6 +121,17 @@ function QuizForm() {
             className="w-full px-3 py-2 border rounded"
           />
         </div>
+        {/* Erklärung */}
+        <div className="mb-4">
+          <label className="block text-gray-700">Erklärung:</label>
+          <input
+            type="text"
+            value={explaination}
+            onChange={(e) => setExplainiation(e.target.value)}
+            className="w-full px-3 py-2 border rounded"
+          />
+        </div>
+
 
   
         {/* Absenden */}
