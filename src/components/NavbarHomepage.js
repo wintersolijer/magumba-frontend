@@ -5,8 +5,10 @@ import { Link } from 'react-router-dom';
 import Sidebar from './homepage/Sidebar';
 import SidebarToggle from './homepage/SidebarToggle';
 
+
 const Navbar = ({ transparent }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
 
   const toggleSidebar = () => {
     console.log('Sidebar toggle clicked');
@@ -34,14 +36,14 @@ const Navbar = ({ transparent }) => {
               to="/"
               className="text-white text-sm font-bold leading-relaxed inline-block ml-4 py-2 whitespace-nowrap uppercase"
             >
-              Mein Spiel
+             
             </Link>
           </div>
 
           {/* Navigation für größere Bildschirme */}
           {/* ... */}
        
-{/* Navigation für größere Bildschirme */}
+{/* Navigation für größere Bildschirme 
           <div
             className={
               'lg:flex flex-grow items-center' +
@@ -66,7 +68,7 @@ const Navbar = ({ transparent }) => {
                 </Link>
               </li>
             </ul>
-          </div>
+          </div>*/}
         </div>
       </nav>
     </>

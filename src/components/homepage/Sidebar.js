@@ -23,19 +23,19 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       <div className="flex flex-col h-full">
         {/* Obere Sektion mit Platzhalter für den Namen */}
         <div className="flex items-center justify-center h-20 border-b border-gray-700">
-          <span className="text-xl font-semibold">Benutzername</span>
+          <span className="text-xl font-semibold">{sessionStorage.getItem('username')}</span>
         </div>
         {/* Menüeinträge */}
         <div className="flex-1 overflow-y-auto">
           <ul className="mt-4">
             <li className="px-6 py-2 hover:bg-gray-700">
-              <Link to="/dashboard">Dashboard</Link>
+              <Link to="/homepage">Startseite</Link>
             </li>
             <li className="px-6 py-2 hover:bg-gray-700">
-              <Link to="/profile">Profil</Link>
+              <Link to="/profile"></Link>
             </li>
             <li className="px-6 py-2 hover:bg-gray-700">
-              <Link to="/settings">Einstellungen</Link>
+              <Link to="/settings"></Link>
             </li>
           </ul>
         </div>

@@ -12,7 +12,7 @@ const Quiz = () => {
   const [error, setError] = useState(null); // Fehlerzustand
 
 
-    const history = useNavigate();
+    const navigate = useNavigate();
   
     // Funktion zum Abrufen eines Cookies
     const getCookie = (cname) => {
@@ -36,10 +36,10 @@ const Quiz = () => {
       const token = sessionStorage.getItem('token') || getCookie('token');
       if (!token) {
         // Wenn kein Token vorhanden ist, zur Login-Seite weiterleiten
-        history.push('/login');
+        navigate('/');
       }
       // Optional: Token validieren (z.B. durch eine Anfrage an den Server)
-    }, [history]);
+    }, [navigate]);
   // Funktion zum Abrufen einer neuen Frage
   const fetchQuestion = async () => {
     setIsLoading(true);
