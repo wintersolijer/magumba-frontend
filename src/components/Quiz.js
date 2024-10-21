@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from './Navbar';
+import Navbar from './NavbarHomepage';
 import FooterSmall from './FooterSmall';
+import { useNavigate } from 'react-router-dom';
 
 let correctAnswersList;
 let questionPoints;
@@ -14,6 +15,36 @@ const Quiz = () => {
   const [showOverlay, setShowOverlay] = useState(false); // State to control overlay visibility
   const [overlayPoints, setOverlayPoints] = useState(null); // State to store the points for the overlay
 
+  const history = useNavigate();
+
+  // Funktion zum Abrufen eines Cookies
+  const getCookie = (cname) => {
+    const name = cname + "=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) === 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  };
+
+  useEffect(() => {
+    // Token aus sessionStorage abrufen
+    const token = sessionStorage.getItem('token') || getCookie('token');
+    if (!token) {
+      // Wenn kein Token vorhanden ist, zur Login-Seite weiterleiten
+      history('/login');
+    }
+    // Optional: Token validieren (z.B. durch eine Anfrage an den Server)
+  }, [history]);
+
+  // Funktion zum Abrufen einer neuen Frage
   const fetchQuestion = async () => {
     setIsLoading(true);
     setError(null);
@@ -119,7 +150,8 @@ const Quiz = () => {
 
   return (
     <>
-      <Navbar transparent />
+      {/* Navbar */}
+      <Navbar />
       <main>
         <section className="relative w-full h-full py-40 min-h-screen">
           <div className="container mx-auto px-4 h-full">
