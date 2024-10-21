@@ -11,7 +11,7 @@ import bgImage from '../assets/img/register_bg_2.png';
 //import gameScreenshot from '../assets/img/game_screenshot.png';
 
 const HomepageSite = () => {
-  const history = useNavigate();
+  const navigate = useNavigate();
 
   // Funktion zum Abrufen eines Cookies
   const getCookie = (cname) => {
@@ -35,10 +35,10 @@ const HomepageSite = () => {
     const token = sessionStorage.getItem('token') || getCookie('token');
     if (!token) {
       // Wenn kein Token vorhanden ist, zur Login-Seite weiterleiten
-      history.push('/login');
+      navigate('/');
     }
     // Optional: Token validieren (z.B. durch eine Anfrage an den Server)
-  }, [history]);
+  }, [navigate]);
 
   // Restlicher Code Ihrer Homepage...
 
@@ -133,7 +133,7 @@ const HomepageSite = () => {
                 </div>
               </div>
             </div>
-            {/* Weitere Informationen */}
+            {/* Weitere Informationen 
             <div className="flex flex-wrap items-center mt-24">
               <div className="w-full md:w-6/12 px-4 mr-auto ml-auto">
 
@@ -196,12 +196,12 @@ const HomepageSite = () => {
                   </a>
                 </div>
               </div>
-            </div>
+            </div>*/}
           </div>
         </section>
       </main>
       {/* Footer */}
-      <FooterSmall />
+      <FooterSmall absolute />
     </>
   );
 };

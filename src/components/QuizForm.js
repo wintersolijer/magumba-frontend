@@ -4,9 +4,10 @@ import FooterSmall from './FooterSmall';
 import registerBgImage from '../assets/img/register_bg_2.png';
 import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from 'react';
 
 function QuizForm() {
-  const history = useNavigate();
+    const navigate = useNavigate();
   
   // Funktion zum Abrufen eines Cookies
   const getCookie = (cname) => {
@@ -24,6 +25,15 @@ function QuizForm() {
     }
     return "";
   }
+  useEffect(() => {
+    // Token aus sessionStorage abrufen
+    const token = sessionStorage.getItem('token') || getCookie('token');
+    if (!token) {
+      // Wenn kein Token vorhanden ist, zur Login-Seite weiterleiten
+      navigate('/');
+    }
+    // Optional: Token validieren (z.B. durch eine Anfrage an den Server)
+  }, [navigate]);
     // Lokale State-Variablen verwenden Sie mit React.useState
     const [question, setQuestion] = React.useState('');
     const [answers, setAnswers] = React.useState([{ answer: '', isTrue: false, explanation: '' }]);

@@ -31,41 +31,27 @@ const Navbar = ({ transparent }) => {
 
             {/* Logo oder Titel */}
             <Link
-              to="/"
+              to="/homepage"
               className="text-white text-sm font-bold leading-relaxed inline-block ml-4 py-2 whitespace-nowrap uppercase"
             >
-              Mein Spiel
+              Startseite
             </Link>
           </div>
 
-          {/* Navigation für größere Bildschirme */}
-          {/* ... */}
-       
-{/* Navigation für größere Bildschirme */}
-          <div
-            className={
-              'lg:flex flex-grow items-center' +
-              (sidebarOpen ? ' flex' : ' hidden')
-            }
-          >
-            <ul className="flex flex-col lg:flex-row list-none lg:ml-auto">
-              <li className="nav-item">
-                <Link
-                  to="/login"
-                  className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-black hover:opacity-75"
-                >
-                  Login
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link
-                  to="/register"
-                  className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-black hover:opacity-75"
-                >
-                  Registrieren
-                </Link>
-              </li>
-            </ul>
+          {/* Navigation */}
+          <div className="flex items-center">
+            <Link
+              to="/quiz"
+              className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+            >
+              Quiz
+            </Link>
+            <Link
+              to="/quizform"
+              className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+            >
+              Quiz erstellen
+            </Link>
           </div>
         </div>
       </nav>

@@ -15,7 +15,7 @@ const Quiz = () => {
   const [showOverlay, setShowOverlay] = useState(false); // State to control overlay visibility
   const [overlayPoints, setOverlayPoints] = useState(null); // State to store the points for the overlay
 
-  const history = useNavigate();
+  const navigate = useNavigate();
 
   // Funktion zum Abrufen eines Cookies
   const getCookie = (cname) => {
@@ -39,10 +39,10 @@ const Quiz = () => {
     const token = sessionStorage.getItem('token') || getCookie('token');
     if (!token) {
       // Wenn kein Token vorhanden ist, zur Login-Seite weiterleiten
-      history('/login');
+      navigate('/');
     }
     // Optional: Token validieren (z.B. durch eine Anfrage an den Server)
-  }, [history]);
+  }, [navigate]);
 
   // Funktion zum Abrufen einer neuen Frage
   const fetchQuestion = async () => {

@@ -11,6 +11,8 @@ import QuizForm from './components/QuizForm';
 import HomepageSite from './components/HomepageSite';
 import Quiz from './components/Quiz';
 import QuizRatingPage from './components/bewertung/QuizRatingPage'; // Korrigierter Importpfad
+import Homepage2 from './components/Hompag2';
+import Dashboard from './components/Dashboard'
 
 function App() {
   const courseId = 'dein-kurs-id'; // Ersetze dies mit der tatsächlichen Kurs-ID oder passe die Logik an, um sie dynamisch zu erhalten
@@ -27,7 +29,9 @@ function App() {
         {/* Weitere Routen */}
         <Route path="/quizform" element={<QuizForm />} />
         <Route path="/homepage" element={<HomepageSite />} />
+        <Route path="/homepage2" element={<Homepage2 />} />
         <Route path="/quiz" element={<Quiz />} />
+        <Route path="/dashboard" element={<Dashboard />} />
 
         {/* Quiz-Bewertungsseite */}
         <Route path="/quizrating" element={<QuizRatingPage courseId={courseId} />} />

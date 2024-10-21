@@ -42,6 +42,7 @@ const Login = () => {
       if (response.ok) {
         const token = data.token; // Nehmen wir an, der Token ist in data.token
         // Token in sessionStorage speichern
+        sessionStorage.setItem('username', email)
         sessionStorage.setItem('token', token);
         // Optional: Token als Cookie speichern (z.B. für 1 Tag)
         setCookie('token', token, 1);

@@ -2,10 +2,11 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom'; // useNavigate importieren
+import { useNavigate } from 'react-router-dom';
+import { FaHome, FaUser, FaCog, FaGamepad, FaPlusSquare, FaTachometerAlt } from 'react-icons/fa';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
-  const navigate = useNavigate(); // useNavigate initialisieren
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     // Token aus sessionStorage entfernen
@@ -23,18 +24,33 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       <div className="flex flex-col h-full">
         {/* Obere Sektion mit Platzhalter für den Namen */}
         <div className="flex items-center justify-center h-20 border-b border-gray-700">
-          <span className="text-xl font-semibold">Benutzername</span>
+          <span className="text-xl font-semibold">{sessionStorage.getItem('username')}</span>
         </div>
         {/* Menüeinträge */}
         <div className="flex-1 overflow-y-auto">
           <ul className="mt-4">
-            <li className="px-6 py-2 hover:bg-gray-700">
+            <li className="px-6 py-2 hover:bg-gray-700 flex items-center">
+              <FaHome className="mr-3" />
+              <Link to="/homepage">Startseite</Link>
+            </li>
+            <li className="px-6 py-2 hover:bg-gray-700 flex items-center">
+              <FaGamepad className="mr-3" />
+              <Link to="/quiz">Quiz</Link>
+            </li>
+            <li className="px-6 py-2 hover:bg-gray-700 flex items-center">
+              <FaPlusSquare className="mr-3" />
+              <Link to="/quizform">Quiz erstellen</Link>
+            </li>
+            <li className="px-6 py-2 hover:bg-gray-700 flex items-center">
+              <FaTachometerAlt className="mr-3" />
               <Link to="/dashboard">Dashboard</Link>
             </li>
-            <li className="px-6 py-2 hover:bg-gray-700">
+            <li className="px-6 py-2 hover:bg-gray-700 flex items-center">
+              <FaUser className="mr-3" />
               <Link to="/profile">Profil</Link>
             </li>
-            <li className="px-6 py-2 hover:bg-gray-700">
+            <li className="px-6 py-2 hover:bg-gray-700 flex items-center">
+              <FaCog className="mr-3" />
               <Link to="/settings">Einstellungen</Link>
             </li>
           </ul>
@@ -42,7 +58,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         {/* Untere Sektion mit Logout-Button */}
         <div className="px-6 py-4 border-t border-gray-700">
           <button
-            onClick={handleLogout} // Hier Funktion zum Abmelden einfügen
+            onClick={handleLogout}
             className="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
           >
             Abmelden
