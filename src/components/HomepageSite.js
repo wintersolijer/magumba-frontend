@@ -3,12 +3,45 @@
 import React from 'react';
 import Navbar from './NavbarHomepage';
 import FooterSmall from './FooterSmall';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Bilder importieren
 import bgImage from '../assets/img/register_bg_2.png';
 //import gameScreenshot from '../assets/img/game_screenshot.png';
 
 const HomepageSite = () => {
+  const history = useNavigate();
+
+  // Funktion zum Abrufen eines Cookies
+  const getCookie = (cname) => {
+    const name = cname + "=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(';');
+    for(let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) === 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  }
+
+  useEffect(() => {
+    // Token aus sessionStorage abrufen
+    const token = sessionStorage.getItem('token') || getCookie('token');
+    if (!token) {
+      // Wenn kein Token vorhanden ist, zur Login-Seite weiterleiten
+      history.push('/login');
+    }
+    // Optional: Token validieren (z.B. durch eine Anfrage an den Server)
+  }, [history]);
+
+  // Restlicher Code Ihrer Homepage...
+
   return (
     <>
       {/* Navbar */}
@@ -43,7 +76,7 @@ const HomepageSite = () => {
                     Erlebe ein spannendes Abenteuer und tauche ein in unsere Welt.
                   </p>
                   <a
-                    href="#jetzt-spielen"
+                    href="/quiz"
                     className="mt-6 inline-block bg-blue-500 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:bg-blue-600 transition duration-300"
                   >
                     Jetzt spielen

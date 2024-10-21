@@ -7,39 +7,76 @@ import FooterSmall from './FooterSmall';
 const Quiz = () => {
   const [questionData, setQuestionData] = useState(null);
   const [selectedAnswers, setSelectedAnswers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Neuer Ladezustand
+  const [error, setError] = useState(null); // Fehlerzustand
+
+  // Funktion zum Abrufen einer neuen Frage
+  const fetchQuestion = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('http://127.0.0.1:5000/get_rand_question');
+      if (!response.ok) {
+        throw new Error('Netzwerkantwort war nicht ok');
+      }
+      const data = await response.json();
+      setQuestionData(data);
+    } catch (error) {
+      console.error('Fehler beim Laden der Frage:', error);
+      setError('Fehler beim Laden der Frage. Bitte versuche es erneut.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Fetch the random question when the component mounts
-    const fetchQuestion = async () => {
-      try {
-        const response = await fetch('/get_rand_question');
-        const data = await response.json();
-        setQuestionData(data);
-      } catch (error) {
-        console.error('Fehler beim Laden der Frage:', error);
-      }
-    };
-
+    // Initiales Laden der Frage beim Mounten des Components
     fetchQuestion();
   }, []);
 
-  const handleAnswerChange = (answerId) => {
-    // Toggle the selected answer
+  const handleAnswerChange = (index) => {
+    // Umschalten der ausgewählten Antwort basierend auf dem Index
     setSelectedAnswers((prevSelected) => {
-      if (prevSelected.includes(answerId)) {
-        // Remove the answer if it's already selected
-        return prevSelected.filter((id) => id !== answerId);
+      if (prevSelected.includes(index)) {
+        // Antwort entfernen, wenn sie bereits ausgewählt ist
+        return prevSelected.filter((id) => id !== index);
       } else {
-        // Add the answer to the selected list
-        return [...prevSelected, answerId];
+        // Antwort zur ausgewählten Liste hinzufügen
+        return [...prevSelected, index];
       }
     });
   };
 
-  const handleSubmit = () => {
-    // Handle the logic when the user submits their answers
-    console.log('Ausgewählte Antworten:', selectedAnswers);
+  const handleSubmit = async () => {
+    if (selectedAnswers.length === 0) {
+      alert('Bitte wähle mindestens eine Antwort aus.');
+      return;
+    }
+
     // Hier kannst du die Logik zum Überprüfen der Antworten implementieren
+    const selected = selectedAnswers.map(index => questionData.answers[index].answer);
+    console.log('Ausgewählte Antworten:', selected);
+
+    // Beispiel: Senden der Antworten an die API (optional)
+    /*
+    try {
+      const response = await fetch('http://127.0.0.1:5000/submit_answers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answers: selected }),
+      });
+      const result = await response.json();
+      console.log('Antwort vom Server:', result);
+    } catch (error) {
+      console.error('Fehler beim Senden der Antworten:', error);
+    }
+    */
+
+    // Zurücksetzen der ausgewählten Antworten
+    setSelectedAnswers([]);
+
+    // Laden einer neuen Frage
+    fetchQuestion();
   };
 
   return (
@@ -54,25 +91,29 @@ const Quiz = () => {
               <div className="w-full lg:w-8/12 px-4">
                 {/* Quiz-Inhalt */}
                 <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white p-6">
-                  {questionData ? (
+                  {isLoading ? (
+                    <p>Frage wird geladen...</p>
+                  ) : error ? (
+                    <p className="text-red-500">{error}</p>
+                  ) : questionData ? (
                     <>
                       <h2 className="text-2xl font-semibold mb-4">
                         {questionData.question}
                       </h2>
                       <form>
-                        {questionData.answers.map((answer) => (
-                          <div key={answer.id} className="flex items-center mb-2">
+                        {questionData.answers.map((answer, index) => (
+                          <div key={index} className="flex items-center mb-2">
                             <input
                               type="checkbox"
-                              id={`answer-${answer.id}`}
-                              name="answers"
-                              value={answer.id}
-                              checked={selectedAnswers.includes(answer.id)}
-                              onChange={() => handleAnswerChange(answer.id)}
+                              id={`answer-${index}`}
+                              name={`answers-${index}`}
+                              value={index}
+                              checked={selectedAnswers.includes(index)}
+                              onChange={() => handleAnswerChange(index)}
                               className="form-checkbox h-5 w-5 text-gray-600"
                             />
-                            <label htmlFor={`answer-${answer.id}`} className="ml-2 text-gray-700">
-                              {answer.text}
+                            <label htmlFor={`answer-${index}`} className="ml-2 text-gray-700">
+                              {answer.answer}
                             </label>
                           </div>
                         ))}
@@ -86,7 +127,7 @@ const Quiz = () => {
                       </form>
                     </>
                   ) : (
-                    <p>Frage wird geladen...</p>
+                    <p>Keine Frage verfügbar.</p>
                   )}
                 </div>
               </div>
