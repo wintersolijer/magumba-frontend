@@ -1,16 +1,19 @@
-// src/components/quiz.js
-
 import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import FooterSmall from './FooterSmall';
 
+let correctAnswersList;
+let questionPoints;
+
 const Quiz = () => {
   const [questionData, setQuestionData] = useState(null);
   const [selectedAnswers, setSelectedAnswers] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // Neuer Ladezustand
-  const [error, setError] = useState(null); // Fehlerzustand
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isCorrect, setIsCorrect] = useState(null);
+  const [showOverlay, setShowOverlay] = useState(false); // State to control overlay visibility
+  const [overlayPoints, setOverlayPoints] = useState(null); // State to store the points for the overlay
 
-  // Funktion zum Abrufen einer neuen Frage
   const fetchQuestion = async () => {
     setIsLoading(true);
     setError(null);
@@ -20,28 +23,30 @@ const Quiz = () => {
         throw new Error('Netzwerkantwort war nicht ok');
       }
       const data = await response.json();
+
+      correctAnswersList = data.answers
+        .filter(answer => answer.isTrue === 'True')
+        .map(answer => answer.answer);
+      questionPoints = data.points;
       setQuestionData(data);
     } catch (error) {
       console.error('Fehler beim Laden der Frage:', error);
       setError('Fehler beim Laden der Frage. Bitte versuche es erneut.');
     } finally {
       setIsLoading(false);
+      setIsCorrect(null); // Reset the correctness state when a new question loads
     }
   };
 
   useEffect(() => {
-    // Initiales Laden der Frage beim Mounten des Components
     fetchQuestion();
   }, []);
 
   const handleAnswerChange = (index) => {
-    // Umschalten der ausgewählten Antwort basierend auf dem Index
     setSelectedAnswers((prevSelected) => {
       if (prevSelected.includes(index)) {
-        // Antwort entfernen, wenn sie bereits ausgewählt ist
         return prevSelected.filter((id) => id !== index);
       } else {
-        // Antwort zur ausgewählten Liste hinzufügen
         return [...prevSelected, index];
       }
     });
@@ -53,44 +58,78 @@ const Quiz = () => {
       return;
     }
 
-    // Hier kannst du die Logik zum Überprüfen der Antworten implementieren
-    const selected = selectedAnswers.map(index => questionData.answers[index].answer);
-    console.log('Ausgewählte Antworten:', selected);
+    let selected = selectedAnswers.map(index => questionData.answers[index].answer);
+    let a = selected.sort();
+    let b = correctAnswersList.sort();
 
-    // Beispiel: Senden der Antworten an die API (optional)
-    /*
-    try {
-      const response = await fetch('http://127.0.0.1:5000/submit_answers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers: selected }),
-      });
-      const result = await response.json();
-      console.log('Antwort vom Server:', result);
-    } catch (error) {
-      console.error('Fehler beim Senden der Antworten:', error);
+    let arraysMatch = true;
+    for (let i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) {
+        arraysMatch = false;
+        break;
+      }
     }
-    */
 
-    // Zurücksetzen der ausgewählten Antworten
-    setSelectedAnswers([]);
+    setIsCorrect(arraysMatch);
+    if (arraysMatch) {
+      const userId = "jfklsajflk"; // You can replace this with the actual user ID
+      const points = questionPoints; // Points from the question
 
-    // Laden einer neuen Frage
-    fetchQuestion();
+      // Show the overlay with the points
+      setOverlayPoints(points);
+      setShowOverlay(true);
+
+      try {
+        // Make the API call to add points
+        const response = await fetch('http://127.0.0.1:5000/add_points', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            points: points,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Fehler beim Hinzufügen von Punkten');
+        }
+
+        const result = await response.json();
+        console.log('Punkte erfolgreich hinzugefügt:', result);
+      } catch (error) {
+        console.error('Fehler beim Hinzufügen von Punkten:', error);
+      }
+
+      // Hide the overlay after 2 seconds
+      setTimeout(() => {
+        setShowOverlay(false);
+        fetchQuestion();
+        setSelectedAnswers([]);
+      }, 2000); // Overlay visible for 2 seconds
+    } else {
+      // Delay fetching a new question if incorrect
+      setTimeout(() => {
+        fetchQuestion();
+        setSelectedAnswers([]);
+      }, 2000);
+    }
   };
 
   return (
     <>
-      {/* Navbar */}
       <Navbar transparent />
       <main>
         <section className="relative w-full h-full py-40 min-h-screen">
-          {/* Hintergrundbild oder Styling bei Bedarf */}
           <div className="container mx-auto px-4 h-full">
             <div className="flex content-center items-center justify-center h-full">
               <div className="w-full lg:w-8/12 px-4">
-                {/* Quiz-Inhalt */}
-                <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white p-6">
+                <div
+                  className={`relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white p-6 ${
+                    isCorrect === true ? 'bg-green-200' : isCorrect === false ? 'bg-red-200' : ''
+                  }`}
+                >
                   {isLoading ? (
                     <p>Frage wird geladen...</p>
                   ) : error ? (
@@ -98,7 +137,7 @@ const Quiz = () => {
                   ) : questionData ? (
                     <>
                       <h2 className="text-2xl font-semibold mb-4">
-                        {questionData.question}
+                        {questionData.question + " +" + questionData.points + " Points"}
                       </h2>
                       <form>
                         {questionData.answers.map((answer, index) => (
@@ -133,7 +172,12 @@ const Quiz = () => {
               </div>
             </div>
           </div>
-          {/* Footer */}
+          {/* Overlay for correct answer */}
+          {showOverlay && (
+            <div className="absolute inset-0 bg-green-500 bg-opacity-75 flex justify-center items-center text-white text-4xl">
+              +{overlayPoints} Points!
+            </div>
+          )}
           <FooterSmall absolute />
         </section>
       </main>
