@@ -1,8 +1,9 @@
 // src/components/quiz.js
 
 import React, { useState, useEffect } from 'react';
-import Navbar from './Navbar';
+import Navbar from './NavbarHomepage';
 import FooterSmall from './FooterSmall';
+import { useNavigate } from 'react-router-dom';
 
 const Quiz = () => {
   const [questionData, setQuestionData] = useState(null);
@@ -10,6 +11,35 @@ const Quiz = () => {
   const [isLoading, setIsLoading] = useState(true); // Neuer Ladezustand
   const [error, setError] = useState(null); // Fehlerzustand
 
+
+    const history = useNavigate();
+  
+    // Funktion zum Abrufen eines Cookies
+    const getCookie = (cname) => {
+      const name = cname + "=";
+      const decodedCookie = decodeURIComponent(document.cookie);
+      const ca = decodedCookie.split(';');
+      for(let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') {
+          c = c.substring(1);
+        }
+        if (c.indexOf(name) === 0) {
+          return c.substring(name.length, c.length);
+        }
+      }
+      return "";
+    }
+  
+    useEffect(() => {
+      // Token aus sessionStorage abrufen
+      const token = sessionStorage.getItem('token') || getCookie('token');
+      if (!token) {
+        // Wenn kein Token vorhanden ist, zur Login-Seite weiterleiten
+        history.push('/login');
+      }
+      // Optional: Token validieren (z.B. durch eine Anfrage an den Server)
+    }, [history]);
   // Funktion zum Abrufen einer neuen Frage
   const fetchQuestion = async () => {
     setIsLoading(true);
@@ -82,7 +112,7 @@ const Quiz = () => {
   return (
     <>
       {/* Navbar */}
-      <Navbar transparent />
+      <Navbar  />
       <main>
         <section className="relative w-full h-full py-40 min-h-screen">
           {/* Hintergrundbild oder Styling bei Bedarf */}

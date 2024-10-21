@@ -14,7 +14,7 @@ import googleIcon from '../assets/img/google.svg';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const history = useNavigate(); // Zum Navigieren nach dem Login
+  const navigate = useNavigate(); // Zum Navigieren nach dem Login
 
   // Funktion zum Setzen eines Cookies
   const setCookie = (cname, cvalue, exdays) => {
@@ -46,9 +46,8 @@ const Login = () => {
         // Optional: Token als Cookie speichern (z.B. für 1 Tag)
         setCookie('token', token, 1);
 
-        alert('Login erfolgreich!');
         // Weiterleitung zur Homepage
-        history.push('/homepage'); // Passen Sie den Pfad an Ihre Routen an
+        navigate('/homepage'); // Passen Sie den Pfad an Ihre Routen an
       } else {
         // Fehlgeschlagenes Login
         alert('Login fehlgeschlagen: ' + data.message);

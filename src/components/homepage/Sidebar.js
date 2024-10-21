@@ -2,8 +2,19 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // useNavigate importieren
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
+  const navigate = useNavigate(); // useNavigate initialisieren
+
+  const handleLogout = () => {
+    // Token aus sessionStorage entfernen
+    sessionStorage.removeItem('token');
+    // Token-Cookie löschen
+    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    // Weiterleitung zur Login-Seite
+    navigate('/');
+  };
   return (
     <div
       className={`fixed top-0 left-0 h-full w-64 bg-gray-800 text-white transition-transform duration-300 ease-in-out z-50`}
@@ -31,7 +42,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         {/* Untere Sektion mit Logout-Button */}
         <div className="px-6 py-4 border-t border-gray-700">
           <button
-            onClick={() => alert('Abmelden')} // Hier Funktion zum Abmelden einfügen
+            onClick={handleLogout} // Hier Funktion zum Abmelden einfügen
             className="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
           >
             Abmelden

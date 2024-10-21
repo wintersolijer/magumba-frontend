@@ -3,8 +3,27 @@ import React from "react";
 import FooterSmall from './FooterSmall';
 import registerBgImage from '../assets/img/register_bg_2.png';
 import Navbar from "./Navbar";
+import { useNavigate } from "react-router-dom";
 
 function QuizForm() {
+  const history = useNavigate();
+  
+  // Funktion zum Abrufen eines Cookies
+  const getCookie = (cname) => {
+    const name = cname + "=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(';');
+    for(let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) === 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  }
     // Lokale State-Variablen verwenden Sie mit React.useState
     const [question, setQuestion] = React.useState('');
     const [answers, setAnswers] = React.useState([{ answer: '', isTrue: false, explanation: '' }]);
