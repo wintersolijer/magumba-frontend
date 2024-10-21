@@ -22,7 +22,7 @@ const Register = () => {
 
     // POST-Request an den Server senden
     try {
-      const response = await fetch('http://localhost:5000/create_person', {
+      const response = await fetch('hhttp://127.0.0.1:5000/create_person', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

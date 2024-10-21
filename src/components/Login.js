@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from './Navbar';
 import FooterSmall from './FooterSmall';
+import { useNavigate } from 'react-router-dom';
 
 // Bilder importieren
 import registerBgImage from '../assets/img/register_bg_2.png';
@@ -11,16 +12,24 @@ import githubIcon from '../assets/img/github.svg';
 import googleIcon from '../assets/img/google.svg';
 
 const Login = () => {
-  // Zustandsvariablen für E-Mail und Passwort
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const history = useNavigate(); // Zum Navigieren nach dem Login
+
+  // Funktion zum Setzen eines Cookies
+  const setCookie = (cname, cvalue, exdays) => {
+    const d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000)); // Ablaufdatum setzen
+    const expires = "expires=" + d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+  }
 
   // Funktion zum Behandeln des Login-Formulars
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:5000/login', {
+      const response = await fetch('http://127.0.0.1:5000/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -31,9 +40,15 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Erfolgreiches Login
+        const token = data.token; // Nehmen wir an, der Token ist in data.token
+        // Token in sessionStorage speichern
+        sessionStorage.setItem('token', token);
+        // Optional: Token als Cookie speichern (z.B. für 1 Tag)
+        setCookie('token', token, 1);
+
         alert('Login erfolgreich!');
-        // Weiterleitung oder weitere Aktionen hier
+        // Weiterleitung zur Homepage
+        history.push('/homepage'); // Passen Sie den Pfad an Ihre Routen an
       } else {
         // Fehlgeschlagenes Login
         alert('Login fehlgeschlagen: ' + data.message);
