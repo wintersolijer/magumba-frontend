@@ -9,9 +9,10 @@ const Navbar = ({ transparent }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {
-    console.log('Sidebar toggle clicked');
     setSidebarOpen(!sidebarOpen);
   };
+
+  const userType = sessionStorage.getItem('userType');
 
   return (
     <>
@@ -29,9 +30,9 @@ const Navbar = ({ transparent }) => {
             {/* Sidebar Toggle */}
             <SidebarToggle toggleSidebar={toggleSidebar} />
 
-            {/* Logo oder Titel */}
+            {/* Logo or Title */}
             <Link
-              to="/homepage"
+              to={userType === 'lecturer' ? '/dashboard' : '/homepage-student'}
               className="text-white text-sm font-bold leading-relaxed inline-block ml-4 py-2 whitespace-nowrap uppercase"
             >
               Startseite
@@ -40,18 +41,67 @@ const Navbar = ({ transparent }) => {
 
           {/* Navigation */}
           <div className="flex items-center">
-            <Link
-              to="/quiz"
-              className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
-            >
-              Quiz
-            </Link>
-            <Link
-              to="/quizform"
-              className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
-            >
-              Quiz erstellen
-            </Link>
+            {userType === 'lecturer' ? (
+              <>
+                <Link
+                  to="/quizform"
+                  className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Quiz erstellen
+                </Link>
+                <Link
+                  to="/student-performance"
+                  className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Leistungen
+                </Link>
+                <Link
+                  to="/settings"
+                  className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Einstellungen
+                </Link>
+                <Link
+                  to="/profile"
+                  className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Profil
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/student-dashboard"
+                  className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/quiz"
+                  className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Quiz
+                </Link>
+                <Link
+                  to="/shop"
+                  className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Shop
+                </Link>
+                <Link
+                  to="/settings"
+                  className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Einstellungen
+                </Link>
+                <Link
+                  to="/profile"
+                  className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Profil
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>

@@ -1,49 +1,35 @@
 // src/components/Register.js
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import FooterSmall from './FooterSmall';
 
-// Bilder importieren (falls benötigt)
+// Images
 import registerBgImage from '../assets/img/register_bg_2.png';
 
 const Register = () => {
-  // Zustandsvariablen für die Eingabefelder
+  // State variables for input fields
   const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [birthday, setBirthday] = useState('');
+  const [lastName, setLastName]   = useState('');
+  const [email, setEmail]         = useState('');
+  const [password, setPassword]   = useState('');
+  const [birthday, setBirthday]   = useState('');
+  const [userType, setUserType]   = useState('student'); // New state variable for user type
 
-  // Funktion zum Behandeln des Registrierungsformulars
+  const navigate = useNavigate();
+
+  // Function to handle the registration form
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // POST-Request an den Server senden
-    try {
-      const response = await fetch('http://127.0.0.1:5000/create_person', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ first_name: firstName, last_name: lastName, email, password, birthday }),
-      });
+    // Mock calculation of ecological footprint
+    const footprint = Math.floor(Math.random() * 100) + 50; // Random value between 50 and 150
+    sessionStorage.setItem('footprint', footprint);
 
-      const data = await response.json();
-
-      if (response.ok) {
-        // Erfolgreiche Registrierung
-        alert('Registrierung erfolgreich!');
-        // Weiterleitung oder weitere Aktionen hier
-      } else {
-        // Fehlgeschlagene Registrierung
-        alert('Registrierung fehlgeschlagen: ' + data.message);
-      }
-    } catch (error) {
-      console.error('Fehler bei der Registrierung:', error);
-      alert('Ein Verbindungsfehler ist aufgetreten.');
-    }
+    // For mockup purposes, we'll just navigate to the login page after registration
+    alert(`Registrierung erfolgreich als ${userType}! Dein ökologischer Fußabdruck ist ${footprint} Punkte.`);
+    navigate('/'); // Redirect to login page
   };
 
   return (
@@ -51,7 +37,7 @@ const Register = () => {
       <Navbar transparent />
       <main>
         <section className="relative w-full h-full py-40 min-h-screen">
-          {/* Hintergrundbild */}
+          {/* Background image */}
           <div
             className="absolute top-0 w-full h-full bg-blueGray-800 bg-no-repeat bg-full"
             style={{
@@ -61,8 +47,8 @@ const Register = () => {
           <div className="container mx-auto px-4 h-full">
             <div className="flex content-center items-center justify-center h-full">
               <div className="w-full lg:w-6/12 px-4">
-                {/* Registrierungsformular */}
-                <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
+                {/* Registration form */}
+                <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0 animate-fade-in">
                   <div className="rounded-t mb-0 px-6 py-6">
                     <div className="text-center">
                       <h6 className="text-gray-500 text-sm font-bold">
@@ -73,7 +59,7 @@ const Register = () => {
                   </div>
                   <div className="flex-auto px-4 lg:px-10 py-10 pt-0">
                     <form onSubmit={handleSubmit}>
-                      {/* Vorname */}
+                      {/* First Name */}
                       <div className="relative w-full mb-3">
                         <label
                           className="block uppercase text-gray-700 text-xs font-bold mb-2"
@@ -91,7 +77,7 @@ const Register = () => {
                           placeholder="Vorname eingeben"
                         />
                       </div>
-                      {/* Nachname */}
+                      {/* Last Name */}
                       <div className="relative w-full mb-3">
                         <label
                           className="block uppercase text-gray-700 text-xs font-bold mb-2"
@@ -109,7 +95,7 @@ const Register = () => {
                           placeholder="Nachname eingeben"
                         />
                       </div>
-                      {/* E-Mail */}
+                      {/* Email */}
                       <div className="relative w-full mb-3">
                         <label
                           className="block uppercase text-gray-700 text-xs font-bold mb-2"
@@ -127,7 +113,7 @@ const Register = () => {
                           placeholder="E-Mail eingeben"
                         />
                       </div>
-                      {/* Passwort */}
+                      {/* Password */}
                       <div className="relative w-full mb-3">
                         <label
                           className="block uppercase text-gray-700 text-xs font-bold mb-2"
@@ -145,7 +131,7 @@ const Register = () => {
                           placeholder="Passwort eingeben"
                         />
                       </div>
-                      {/* Geburtsdatum */}
+                      {/* Birthday */}
                       <div className="relative w-full mb-3">
                         <label
                           className="block uppercase text-gray-700 text-xs font-bold mb-2"
@@ -163,12 +149,43 @@ const Register = () => {
                           placeholder="Geburtsdatum eingeben"
                         />
                       </div>
+                      {/* User Type Selection */}
+                      <div className="relative w-full mb-3">
+                        <label className="block uppercase text-gray-700 text-xs font-bold mb-2">
+                          Benutzerrolle
+                        </label>
+                        <div className="flex items-center">
+                          <label className="inline-flex items-center mr-4">
+                            <input
+                              type="radio"
+                              className="form-radio h-5 w-5 text-gray-600"
+                              name="userType"
+                              value="student"
+                              checked={userType === 'student'}
+                              onChange={(e) => setUserType(e.target.value)}
+                            />
+                            <span className="ml-2 text-gray-700">Student</span>
+                          </label>
+                          <label className="inline-flex items-center">
+                            <input
+                              type="radio"
+                              className="form-radio h-5 w-5 text-gray-600"
+                              name="userType"
+                              value="lecturer"
+                              checked={userType === 'lecturer'}
+                              onChange={(e) => setUserType(e.target.value)}
+                            />
+                            <span className="ml-2 text-gray-700">Dozent</span>
+                          </label>
+                        </div>
+                      </div>
+                      {/* Terms and Conditions */}
                       <div className="flex items-center">
                         <label className="inline-flex items-center cursor-pointer">
                           <input
                             id="customCheckRegister"
                             type="checkbox"
-                            className="form-checkbox border-0 rounded text-gray-800 ml-1 w-5 h-5 ease-linear transition-all duration-150"
+                            className="form-checkbox border-0 rounded text-gray-800 ml-1 w-5 h-5"
                             required
                           />
                           <span className="ml-2 text-sm font-semibold text-gray-700">
@@ -180,9 +197,10 @@ const Register = () => {
                           </span>
                         </label>
                       </div>
+                      {/* Submit Button */}
                       <div className="text-center mt-6">
                         <button
-                          className="bg-gray-800 text-white active:bg-gray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg focus:outline-none w-full"
+                          className="bg-gray-800 text-white active:bg-gray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg focus:outline-none w-full hover:bg-gray-700 transition duration-300"
                           type="submit"
                         >
                           Registrieren
@@ -201,7 +219,7 @@ const Register = () => {
               </div>
             </div>
           </div>
-          {/* Footer mit absolute Positionierung */}
+          {/* Footer with absolute positioning */}
           <FooterSmall absolute />
         </section>
       </main>

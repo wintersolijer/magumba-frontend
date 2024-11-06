@@ -1,76 +1,80 @@
 // src/components/Login.js
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import FooterSmall from './FooterSmall';
-import { useNavigate } from 'react-router-dom';
 
-// Bilder importieren
+// Images
 import registerBgImage from '../assets/img/register_bg_2.png';
 import githubIcon from '../assets/img/github.svg';
 import googleIcon from '../assets/img/google.svg';
 
+// Mock users for login
+const mockUsers = [
+  { email: 'student@example.com', password: 'student123', userType: 'student' },
+  { email: 'lecturer@example.com', password: 'lecturer123', userType: 'lecturer' },
+];
+
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate(); // Zum Navigieren nach dem Login
+  const navigate = useNavigate();
 
-  // Funktion zum Setzen eines Cookies
+  // Function to set a cookie
   const setCookie = (cname, cvalue, exdays) => {
-    const d = new Date();
-    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000)); // Ablaufdatum setzen
-    const expires = "expires=" + d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-  }
+    const d       = new Date();
+    d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
+    const expires = 'expires=' + d.toUTCString();
+    document.cookie = cname + '=' + cvalue + ';' + expires + ';path=/';
+  };
 
-  // Funktion zum Behandeln des Login-Formulars
+  // Handle login form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      const response = await fetch('http://127.0.0.1:5000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+    // Mock authentication
+    const user = mockUsers.find(
+      (user) => user.email === email && user.password === password
+    );
 
-      const data = await response.json();
+    if (user) {
+      // Set user info in sessionStorage
+      sessionStorage.setItem('username', email);
+      sessionStorage.setItem('userType', user.userType);
+      sessionStorage.setItem('token', 'mock-token'); // Mock token
 
-      if (response.ok) {
-        const token = data.token; // Nehmen wir an, der Token ist in data.token
-        // Token in sessionStorage speichern
-        sessionStorage.setItem('username', email)
-        sessionStorage.setItem('token', token);
-        // Optional: Token als Cookie speichern (z.B. für 1 Tag)
-        setCookie('token', token, 1);
+      // Set token as cookie (optional)
+      setCookie('token', 'mock-token', 1);
 
-        // Weiterleitung zur Homepage
-        navigate('/homepage'); // Passen Sie den Pfad an Ihre Routen an
-      } else {
-        // Fehlgeschlagenes Login
-        alert('Login fehlgeschlagen: ' + data.message);
+      // Redirect based on user type
+      if (user.userType === 'student') {
+        navigate('/homepage-student');
+      } else if (user.userType === 'lecturer') {
+        navigate('/dashboard');
       }
-    } catch (error) {
-      console.error('Fehler beim Login:', error);
-      alert('Ein Verbindungsfehler ist aufgetreten.');
+    } else {
+      alert('Ungültige Anmeldedaten');
     }
   };
 
-  // Mock-Funktion für Google Login
+  // Mock function for Google Login
   const handleMockGoogleLogin = () => {
-    // Simulierte Benutzerinformationen
+    // Simulated user info
     const mockUser = {
       name: 'Max Mustermann',
       email: 'max.mustermann@example.com',
-      // Weitere Benutzerinformationen
+      userType: 'student',
     };
 
     console.log('Mock Google User:', mockUser);
     alert('Mock Google Login erfolgreich!');
-    // Hier kannst du weitere Aktionen durchführen, z.B. Weiterleitung
+    // Set user info in sessionStorage
+    sessionStorage.setItem('username', mockUser.email);
+    sessionStorage.setItem('userType', mockUser.userType);
+    sessionStorage.setItem('token', 'mock-token'); // Mock token
+
+    navigate('/homepage-student');
   };
 
   return (
@@ -79,7 +83,7 @@ const Login = () => {
       <Navbar transparent />
       <main>
         <section className="relative w-full h-full py-40 min-h-screen">
-          {/* Hintergrundbild */}
+          {/* Background image */}
           <div
             className="absolute top-0 w-full h-full bg-blueGray-800 bg-no-repeat bg-full"
             style={{
@@ -89,8 +93,8 @@ const Login = () => {
           <div className="container mx-auto px-4 h-full">
             <div className="flex content-center items-center justify-center h-full">
               <div className="w-full lg:w-4/12 px-4">
-                {/* Login-Formular */}
-                <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
+                {/* Login form */}
+                <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0 animate-fade-in-down">
                   <div className="rounded-t mb-0 px-6 py-6">
                     <div className="text-center mb-3">
                       <h6 className="text-gray-500 text-sm font-bold">
@@ -164,7 +168,7 @@ const Login = () => {
                           <input
                             id="customCheckLogin"
                             type="checkbox"
-                            className="form-checkbox border-0 rounded text-gray-800 ml-1 w-5 h-5 ease-linear transition-all duration-150"
+                            className="form-checkbox border-0 rounded text-gray-800 ml-1 w-5 h-5"
                           />
                           <span className="ml-2 text-sm font-semibold text-gray-700">
                             Merken
@@ -173,7 +177,7 @@ const Login = () => {
                       </div>
                       <div className="text-center mt-6">
                         <button
-                          className="bg-gray-800 text-white active:bg-gray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg focus:outline-none w-full"
+                          className="bg-gray-800 text-white active:bg-gray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg focus:outline-none w-full hover:bg-gray-700 transition duration-300"
                           type="submit"
                         >
                           Einloggen

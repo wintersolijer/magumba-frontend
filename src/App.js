@@ -4,37 +4,62 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
-// Importiere die Komponenten
+// Import components
 import Login from './components/Login';
 import Register from './components/Register';
 import QuizForm from './components/QuizForm';
-import HomepageSite from './components/HomepageSite';
+import HomepageSite from './components/HomepageSite'; // Student homepage
+import Dashboard from './components/Dashboard'; // Lecturer homepage
 import Quiz from './components/Quiz';
-import QuizRatingPage from './components/bewertung/QuizRatingPage'; // Korrigierter Importpfad
-import Homepage2 from './components/Hompag2';
-import Dashboard from './components/Dashboard'
+import QuizRatingPage from './components/bewertung/QuizRatingPage';
+import Shop from './components/Shop'; // Shop component
+import ViewPerformance from './components/ViewPerformance'; // View Performance component
+import Settings from './components/Settings'; // Settings component
+import Profile from './components/Profile'; // Profile component
 
 function App() {
-  const courseId = 'dein-kurs-id'; // Ersetze dies mit der tatsächlichen Kurs-ID oder passe die Logik an, um sie dynamisch zu erhalten
+  const courseId = 'dein-kurs-id'; // Replace with actual course ID if needed
 
   return (
     <Router>
       <Routes>
-        {/* Login-Seite */}
+        {/* Login page */}
         <Route path="/" element={<Login />} />
 
-        {/* Registrierungsseite */}
+        {/* Registration page */}
         <Route path="/register" element={<Register />} />
 
-        {/* Weitere Routen */}
-        <Route path="/quizform" element={<QuizForm />} />
-        <Route path="/homepage" element={<HomepageSite />} />
-        <Route path="/homepage2" element={<Homepage2 />} />
-        <Route path="/quiz" element={<Quiz />} />
+        {/* Student homepage */}
+        <Route path="/homepage-student" element={<HomepageSite />} />
+
+        {/* Lecturer homepage */}
         <Route path="/dashboard" element={<Dashboard />} />
 
-        {/* Quiz-Bewertungsseite */}
+        {/* Quiz form (accessible by lecturers) */}
+        <Route path="/quizform" element={<QuizForm />} />
+
+        {/* Quiz page */}
+        <Route path="/quiz" element={<Quiz />} />
+
+        {/* Shop page */}
+        <Route path="/shop" element={<Shop />} />
+
+        {/* View Performance page */}
+        <Route path="/student-performance" element={<ViewPerformance />} />
+
+        {/* Student Dashboard */}
+        <Route path="/student-dashboard" element={<HomepageSite />} />
+
+        {/* Settings page */}
+        <Route path="/settings" element={<Settings />} />
+
+        {/* Profile page */}
+        <Route path="/profile" element={<Profile />} />
+
+        {/* Quiz rating page */}
         <Route path="/quizrating" element={<QuizRatingPage courseId={courseId} />} />
+
+        {/* Additional routes can be added here */}
       </Routes>
     </Router>
   );

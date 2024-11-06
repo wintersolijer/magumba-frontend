@@ -1,3 +1,5 @@
+// src/components/Quiz.js
+
 import React, { useState, useEffect } from 'react';
 import Navbar from './NavbarHomepage';
 import FooterSmall from './FooterSmall';
@@ -9,19 +11,21 @@ let questionPoints;
 const Quiz = () => {
   const [questionData, setQuestionData] = useState(null);
   const [selectedAnswers, setSelectedAnswers] = useState([]);
+  const [fillInAnswer, setFillInAnswer] = useState(''); // For fill-in-the-blank
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isCorrect, setIsCorrect] = useState(null);
-  const [showOverlay, setShowOverlay] = useState(false); // State to control overlay visibility
-  const [overlayPoints, setOverlayPoints] = useState(null); // State to store the points for the overlay
+  const [showOverlay, setShowOverlay] = useState(false);
+  const [overlayPoints, setOverlayPoints] = useState(null);
+  const [showExplanation, setShowExplanation] = useState(false);
 
   const navigate = useNavigate();
 
-  // Funktion zum Abrufen eines Cookies
+  // Function to get a cookie
   const getCookie = (cname) => {
-    const name = cname + "=";
+    const name = cname + '=';
     const decodedCookie = decodeURIComponent(document.cookie);
-    const ca = decodedCookie.split(';');
+    const ca            = decodedCookie.split(';');
     for (let i = 0; i < ca.length; i++) {
       let c = ca[i];
       while (c.charAt(0) === ' ') {
@@ -31,33 +35,39 @@ const Quiz = () => {
         return c.substring(name.length, c.length);
       }
     }
-    return "";
+    return '';
   };
 
   useEffect(() => {
-    // Token aus sessionStorage abrufen
-    const token = sessionStorage.getItem('token') || getCookie('token');
-    if (!token) {
-      // Wenn kein Token vorhanden ist, zur Login-Seite weiterleiten
+    // Get token from sessionStorage
+    const token    = sessionStorage.getItem('token') || getCookie('token');
+    const userType = sessionStorage.getItem('userType');
+    if (!token || userType !== 'student') {
+      // Redirect to login page if no token or not a student
       navigate('/');
     }
-    // Optional: Token validieren (z.B. durch eine Anfrage an den Server)
+    // Optional: Validate token
   }, [navigate]);
 
-  // Funktion zum Abrufen einer neuen Frage
+  // Function to fetch a new question
   const fetchQuestion = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://127.0.0.1:5000/get_rand_question');
-      if (!response.ok) {
-        throw new Error('Netzwerkantwort war nicht ok');
+      // Fetch questions from localStorage
+      const questions = JSON.parse(localStorage.getItem('questions')) || [];
+      if (questions.length === 0) {
+        setError('Keine Fragen verfügbar. Bitte später erneut versuchen.');
+        setQuestionData(null);
+        return;
       }
-      const data = await response.json();
+      // Randomly select a question
+      const randomIndex = Math.floor(Math.random() * questions.length);
+      const data        = questions[randomIndex];
 
       correctAnswersList = data.answers
-        .filter(answer => answer.isTrue === 'True')
-        .map(answer => answer.answer);
+        .filter((ans) => ans.isTrue)
+        .map((ans) => ans.answer.toLowerCase().trim());
       questionPoints = data.points;
       setQuestionData(data);
     } catch (error) {
@@ -65,7 +75,8 @@ const Quiz = () => {
       setError('Fehler beim Laden der Frage. Bitte versuche es erneut.');
     } finally {
       setIsLoading(false);
-      setIsCorrect(null); // Reset the correctness state when a new question loads
+      setIsCorrect(null);
+      setShowExplanation(false);
     }
   };
 
@@ -84,68 +95,56 @@ const Quiz = () => {
   };
 
   const handleSubmit = async () => {
-    if (selectedAnswers.length === 0) {
-      alert('Bitte wähle mindestens eine Antwort aus.');
-      return;
-    }
+    let isAnswerCorrect = false;
 
-    let selected = selectedAnswers.map(index => questionData.answers[index].answer);
-    let a = selected.sort();
-    let b = correctAnswersList.sort();
-
-    let arraysMatch = true;
-    for (let i = 0; i < a.length; i++) {
-      if (a[i] !== b[i]) {
-        arraysMatch = false;
-        break;
+    if (questionData.type === 'multiple_choice') {
+      if (selectedAnswers.length === 0) {
+        alert('Bitte wähle mindestens eine Antwort aus.');
+        return;
       }
+
+      let selected = selectedAnswers
+        .map((index) => questionData.answers[index].answer.toLowerCase().trim())
+        .sort();
+      let correct = [...correctAnswersList].sort();
+
+      isAnswerCorrect = JSON.stringify(selected) === JSON.stringify(correct);
+    } else if (questionData.type === 'true_false') {
+      if (selectedAnswers.length === 0) {
+        alert('Bitte wähle eine Antwort aus.');
+        return;
+      }
+
+      let selected = questionData.answers[selectedAnswers[0]].isTrue;
+      isAnswerCorrect = selected === true;
+    } else if (questionData.type === 'fill_in_blank') {
+      if (fillInAnswer.trim() === '') {
+        alert('Bitte fülle die Antwort aus.');
+        return;
+      }
+      isAnswerCorrect = correctAnswersList.includes(fillInAnswer.trim().toLowerCase());
     }
 
-    setIsCorrect(arraysMatch);
-    if (arraysMatch) {
-      const userId = "jfklsajflk"; // You can replace this with the actual user ID
-      const points = questionPoints; // Points from the question
+    setIsCorrect(isAnswerCorrect);
+    setShowExplanation(true);
 
-      // Show the overlay with the points
+    if (isAnswerCorrect) {
+      const points = questionPoints;
       setOverlayPoints(points);
       setShowOverlay(true);
 
-      try {
-        // Make the API call to add points
-        const response = await fetch('http://127.0.0.1:5000/add_points', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            user_id: userId,
-            points: points,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Fehler beim Hinzufügen von Punkten');
-        }
-
-        const result = await response.json();
-        console.log('Punkte erfolgreich hinzugefügt:', result);
-      } catch (error) {
-        console.error('Fehler beim Hinzufügen von Punkten:', error);
-      }
-
-      // Hide the overlay after 2 seconds
+      // Mock API call to update student's points
       setTimeout(() => {
         setShowOverlay(false);
-        fetchQuestion();
-        setSelectedAnswers([]);
-      }, 2000); // Overlay visible for 2 seconds
-    } else {
-      // Delay fetching a new question if incorrect
-      setTimeout(() => {
-        fetchQuestion();
-        setSelectedAnswers([]);
       }, 2000);
     }
+  };
+
+  const handleNextQuestion = () => {
+    setShowExplanation(false);
+    setSelectedAnswers([]);
+    setFillInAnswer('');
+    fetchQuestion();
   };
 
   return (
@@ -158,8 +157,12 @@ const Quiz = () => {
             <div className="flex content-center items-center justify-center h-full">
               <div className="w-full lg:w-8/12 px-4">
                 <div
-                  className={`relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white p-6 ${
-                    isCorrect === true ? 'bg-green-200' : isCorrect === false ? 'bg-red-200' : ''
+                  className={`relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white p-6 animate-fade-in-up ${
+                    isCorrect === true
+                      ? 'bg-green-100'
+                      : isCorrect === false
+                      ? 'bg-red-100'
+                      : ''
                   }`}
                 >
                   {isLoading ? (
@@ -169,33 +172,115 @@ const Quiz = () => {
                   ) : questionData ? (
                     <>
                       <h2 className="text-2xl font-semibold mb-4">
-                        {questionData.question + " +" + questionData.points + " Points"}
+                        {questionData.question + ' +' + questionData.points + ' Punkte'}
                       </h2>
                       <form>
-                        {questionData.answers.map((answer, index) => (
-                          <div key={index} className="flex items-center mb-2">
+                        {questionData.type === 'multiple_choice' && (
+                          <>
+                            {questionData.answers.map((answer, index) => (
+                              <div
+                                key={index}
+                                className={`flex items-center mb-2 p-2 rounded ${
+                                  isCorrect !== null
+                                    ? answer.isTrue
+                                      ? 'bg-green-200'
+                                      : selectedAnswers.includes(index)
+                                      ? 'bg-red-200'
+                                      : ''
+                                    : ''
+                                }`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  id={`answer-${index}`}
+                                  name={`answers-${index}`}
+                                  value={index}
+                                  checked={selectedAnswers.includes(index)}
+                                  onChange={() => handleAnswerChange(index)}
+                                  className="form-checkbox h-5 w-5 text-gray-600"
+                                  disabled={isCorrect !== null}
+                                />
+                                <label htmlFor={`answer-${index}`} className="ml-2 text-gray-700">
+                                  {answer.answer}
+                                </label>
+                              </div>
+                            ))}
+                          </>
+                        )}
+                        {questionData.type === 'true_false' && (
+                          <>
+                            {questionData.answers.map((answer, index) => (
+                              <div
+                                key={index}
+                                className={`flex items-center mb-2 p-2 rounded ${
+                                  isCorrect !== null
+                                    ? answer.isTrue
+                                      ? 'bg-green-200'
+                                      : selectedAnswers.includes(index)
+                                      ? 'bg-red-200'
+                                      : ''
+                                    : ''
+                                }`}
+                              >
+                                <input
+                                  type="radio"
+                                  id={`answer-${index}`}
+                                  name="true_false"
+                                  value={index}
+                                  checked={selectedAnswers.includes(index)}
+                                  onChange={() => setSelectedAnswers([index])}
+                                  className="form-radio h-5 w-5 text-gray-600"
+                                  disabled={isCorrect !== null}
+                                />
+                                <label htmlFor={`answer-${index}`} className="ml-2 text-gray-700">
+                                  {answer.answer}
+                                </label>
+                              </div>
+                            ))}
+                          </>
+                        )}
+                        {questionData.type === 'fill_in_blank' && (
+                          <>
                             <input
-                              type="checkbox"
-                              id={`answer-${index}`}
-                              name={`answers-${index}`}
-                              value={index}
-                              checked={selectedAnswers.includes(index)}
-                              onChange={() => handleAnswerChange(index)}
-                              className="form-checkbox h-5 w-5 text-gray-600"
+                              type="text"
+                              value={fillInAnswer}
+                              onChange={(e) => setFillInAnswer(e.target.value)}
+                              className="w-full px-3 py-2 border rounded"
+                              placeholder="Deine Antwort"
+                              disabled={isCorrect !== null}
                             />
-                            <label htmlFor={`answer-${index}`} className="ml-2 text-gray-700">
-                              {answer.answer}
-                            </label>
-                          </div>
-                        ))}
-                        <button
-                          type="button"
-                          className="mt-4 bg-gray-800 text-white text-sm font-bold uppercase px-6 py-2 rounded shadow hover:shadow-lg focus:outline-none"
-                          onClick={handleSubmit}
-                        >
-                          Abschicken
-                        </button>
+                            {isCorrect === false && (
+                              <p className="mt-2 text-red-600">
+                                Falsche Antwort. Korrekte Antwort(en):{' '}
+                                {correctAnswersList.join(', ')}
+                              </p>
+                            )}
+                          </>
+                        )}
+                        {isCorrect === null && (
+                          <button
+                            type="button"
+                            className="mt-4 bg-gray-800 text-white text-sm font-bold uppercase px-6 py-2 rounded shadow hover:shadow-lg focus:outline-none hover:bg-gray-700 transition duration-300"
+                            onClick={handleSubmit}
+                          >
+                            Abschicken
+                          </button>
+                        )}
                       </form>
+                      {showExplanation && questionData.explanation && (
+                        <div className="mt-4 p-4 bg-gray-100 rounded">
+                          <h3 className="text-lg font-semibold">Erklärung:</h3>
+                          <p className="text-gray-700">{questionData.explanation}</p>
+                        </div>
+                      )}
+                      {showExplanation && (
+                        <button
+                          onClick={handleNextQuestion}
+                          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
+                        >
+                          Weiter
+                        </button>
+                      )}
                     </>
                   ) : (
                     <p>Keine Frage verfügbar.</p>
@@ -206,8 +291,8 @@ const Quiz = () => {
           </div>
           {/* Overlay for correct answer */}
           {showOverlay && (
-            <div className="absolute inset-0 bg-green-500 bg-opacity-75 flex justify-center items-center text-white text-4xl">
-              +{overlayPoints} Points!
+            <div className="absolute inset-0 bg-green-500 bg-opacity-75 flex justify-center items-center text-white text-4xl animate-fade-in">
+              +{overlayPoints} Punkte!
             </div>
           )}
           <FooterSmall absolute />

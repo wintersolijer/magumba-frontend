@@ -6,7 +6,7 @@ const SidebarToggle = ({ toggleSidebar }) => {
   return (
     <button
       onClick={toggleSidebar}
-      className="text-white focus:outline-none "
+      className="text-white focus:outline-none"
     >
       {/* Hamburger Icon */}
       <i className="fas fa-bars fa-2x"></i>

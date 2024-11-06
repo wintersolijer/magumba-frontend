@@ -1,24 +1,71 @@
-// src/components/Hompage.js
+// src/components/HomepageSite.js
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Navbar from './NavbarHomepage';
 import FooterSmall from './FooterSmall';
-import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// Bilder importieren
+// Images
 import bgImage from '../assets/img/register_bg_2.png';
-//import gameScreenshot from '../assets/img/game_screenshot.png';
+
+// Icons
+import { FaLeaf, FaGlobe, FaWater } from 'react-icons/fa';
+
+const NewsTicker = () => {
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+
+  const newsItems = [
+    {
+      title: 'Neue Studie zur Reduzierung von CO₂-Emissionen veröffentlicht',
+      date: '22. Oktober 2024',
+      author: 'Dr. Müller',
+      icon: <FaLeaf className="text-green-500" />,
+    },
+    {
+      title: 'Entdeckung eines nachhaltigen Materials für Batterien',
+      date: '20. Oktober 2024',
+      author: 'Prof. Schmidt',
+      icon: <FaGlobe className="text-blue-500" />,
+    },
+    {
+      title: 'Forschungsergebnisse zur Reinigung von Meeren vorgestellt',
+      date: '18. Oktober 2024',
+      author: 'Dr. Fischer',
+      icon: <FaWater className="text-blue-400" />,
+    },
+    // More news items...
+  ];
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((currentIndex + 1) % newsItems.length);
+    }, 5000); // Switch every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [currentIndex, newsItems.length]);
+
+  return (
+    <div className="bg-gray-800 text-white py-2 animate-marquee">
+      <div className="container mx-auto flex items-center">
+        <span className="mr-4">{newsItems[currentIndex].icon}</span>
+        <p className="text-sm">
+          <strong>{newsItems[currentIndex].date}</strong> -{' '}
+          {newsItems[currentIndex].title} ({newsItems[currentIndex].author})
+        </p>
+      </div>
+    </div>
+  );
+};
 
 const HomepageSite = () => {
   const navigate = useNavigate();
 
-  // Funktion zum Abrufen eines Cookies
+  // Function to get a cookie
   const getCookie = (cname) => {
-    const name = cname + "=";
+    const name          = cname + '=';
     const decodedCookie = decodeURIComponent(document.cookie);
-    const ca = decodedCookie.split(';');
-    for(let i = 0; i < ca.length; i++) {
+    const ca            = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
       let c = ca[i];
       while (c.charAt(0) === ' ') {
         c = c.substring(1);
@@ -27,27 +74,30 @@ const HomepageSite = () => {
         return c.substring(name.length, c.length);
       }
     }
-    return "";
-  }
+    return '';
+  };
 
   useEffect(() => {
-    // Token aus sessionStorage abrufen
+    // Get token from sessionStorage
     const token = sessionStorage.getItem('token') || getCookie('token');
-    if (!token) {
-      // Wenn kein Token vorhanden ist, zur Login-Seite weiterleiten
+    const userType = sessionStorage.getItem('userType');
+    if (!token || userType !== 'student') {
+      // Redirect to login page if no token or not a student
       navigate('/');
     }
-    // Optional: Token validieren (z.B. durch eine Anfrage an den Server)
+    // Optional: Validate token
   }, [navigate]);
 
-  // Restlicher Code Ihrer Homepage...
+  const footprint = sessionStorage.getItem('footprint') || '100';
 
   return (
     <>
       {/* Navbar */}
-      <Navbar  />
+      <Navbar />
+      {/* NewsTicker */}
+      <NewsTicker />
       <main>
-        {/* Hero-Bereich */}
+        {/* Hero Section */}
         <div
           className="relative pt-16 pb-32 flex content-center items-center justify-center"
           style={{
@@ -67,7 +117,7 @@ const HomepageSite = () => {
           </div>
           <div className="container relative mx-auto">
             <div className="items-center flex flex-wrap">
-              <div className="w-full lg:w-8/12 px-4 ml-auto mr-auto text-center">
+              <div className="w-full lg:w-8/12 px-4 ml-auto mr-auto text-center animate-fade-in-up">
                 <div className="pr-12">
                   <h1 className="text-white font-semibold text-5xl">
                     Willkommen zu unserem Spiel!
@@ -77,22 +127,27 @@ const HomepageSite = () => {
                   </p>
                   <a
                     href="/quiz"
-                    className="mt-6 inline-block bg-blue-500 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:bg-blue-600 transition duration-300"
+                    className="mt-6 inline-block bg-blue-500 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:bg-blue-600 transition duration-300 animate-bounce"
                   >
                     Jetzt spielen
                   </a>
                 </div>
               </div>
+              {/* Ecological Footprint */}
+              <div className="absolute top-0 right-0 mt-4 mr-4 bg-white bg-opacity-80 p-4 rounded shadow-lg">
+                <h3 className="text-xl font-semibold">Dein ökologischer Fußabdruck:</h3>
+                <p className="text-3xl font-bold text-green-600">{footprint}</p>
+              </div>
             </div>
           </div>
         </div>
-        {/* Features-Bereich */}
+        {/* Features Section */}
         <section className="pb-20 bg-gray-100 -mt-24">
           <div className="container mx-auto px-4">
             <div className="flex flex-wrap">
               {/* Feature 1 */}
               <div className="w-full md:w-4/12 px-4 text-center">
-                <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg">
+                <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg hover:shadow-2xl transition duration-300 animate-fade-in">
                   <div className="px-4 py-5 flex-auto">
                     <div className="text-white p-3 w-12 h-12 mb-5 inline-flex items-center justify-center rounded-full bg-red-500">
                       <i className="fas fa-trophy"></i>
@@ -106,7 +161,7 @@ const HomepageSite = () => {
               </div>
               {/* Feature 2 */}
               <div className="w-full md:w-4/12 px-4 text-center">
-                <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg">
+                <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg hover:shadow-2xl transition duration-300 animate-fade-in">
                   <div className="px-4 py-5 flex-auto">
                     <div className="text-white p-3 w-12 h-12 mb-5 inline-flex items-center justify-center rounded-full bg-blue-500">
                       <i className="fas fa-gamepad"></i>
@@ -120,7 +175,7 @@ const HomepageSite = () => {
               </div>
               {/* Feature 3 */}
               <div className="w-full md:w-4/12 px-4 text-center">
-                <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg">
+                <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg hover:shadow-2xl transition duration-300 animate-fade-in">
                   <div className="px-4 py-5 flex-auto">
                     <div className="text-white p-3 w-12 h-12 mb-5 inline-flex items-center justify-center rounded-full bg-green-500">
                       <i className="fas fa-users"></i>
@@ -133,75 +188,12 @@ const HomepageSite = () => {
                 </div>
               </div>
             </div>
-            {/* Weitere Informationen 
-            <div className="flex flex-wrap items-center mt-24">
-              <div className="w-full md:w-6/12 px-4 mr-auto ml-auto">
-
-              </div>
-              <div className="w-full md:w-5/12 px-4 mr-auto ml-auto">
-                <div className="md:pr-12">
-                  <h3 className="text-3xl font-semibold">Tauche tiefer ein</h3>
-                  <p className="mt-4 text-lg leading-relaxed text-gray-600">
-                    Unsere Spielwelt bietet unendliche Möglichkeiten und Abenteuer.
-                  </p>
-                  <ul className="list-none mt-6">
-                    <li className="py-2">
-                      <div className="flex items-center">
-                        <div>
-                          <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-white bg-blue-500 mr-3">
-                            <i className="fas fa-fingerprint"></i>
-                          </span>
-                        </div>
-                        <div>
-                          <h4 className="text-gray-600">
-                            Sichere und zuverlässige Server
-                          </h4>
-                        </div>
-                      </div>
-                    </li>
-                    <li className="py-2">
-                      <div className="flex items-center">
-                        <div>
-                          <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-white bg-red-500 mr-3">
-                            <i className="fas fa-gift"></i>
-                          </span>
-                        </div>
-                        <div>
-                          <h4 className="text-gray-600">
-                            Exklusive Belohnungen
-                          </h4>
-                        </div>
-                      </div>
-                    </li>
-                    <li className="py-2">
-                      <div className="flex items-center">
-                        <div>
-                          <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-white bg-green-500 mr-3">
-                            <i className="fas fa-user-friends"></i>
-                          </span>
-                        </div>
-                        <div>
-                          <h4 className="text-gray-600">
-                            Spiele mit Freunden
-                          </h4>
-                        </div>
-                      </div>
-                    </li>
-                  </ul>
-                  <a
-                    href="#mehr-erfahren"
-                    className="mt-6 inline-block bg-blue-500 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:bg-blue-600 transition duration-300"
-                  >
-                    Mehr erfahren
-                  </a>
-                </div>
-              </div>
-            </div>*/}
+            {/* Additional content can be added here */}
           </div>
         </section>
       </main>
       {/* Footer */}
-      <FooterSmall absolute />
+      <FooterSmall />
     </>
   );
 };
